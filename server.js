@@ -16,8 +16,8 @@ http.get(url, function(res){
 
     res.on('end', function(){
         var fbResponse = JSON.parse(body);
-        console.log("Got a response: ", fbResponse.resultSet.vehicle[1].latitude);
-        response.json(fbResponse);
+        console.log("Got a response: ", fbResponse.resultSet.vehicle[1].type);
+        response.json(fbResponse.resultSet.vehicle);
     });
 }).on('error', function(e){
       console.log("Got an error: ", e);
