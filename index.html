@@ -1,29 +1,36 @@
 <!DOCTYPE html>
 <html ng-app="mapcontrol">
  <head>
- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
- <style type="text/css">
-  html, body { height: 100%; margin: 0; padding: 0; }
- 
-</style>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="style.css">
   <title> Initial Commit</title>
  </head>
  <body>
-  <ul>
-    <li ng-repeat="vehicle in vehicles">
-      <span>{{vehicle.latitude}}</span>
-      <p>{{vehicle.longitude}}</p>
-    </li>
-  </ul>
+  
       <div class="container" ng-controller="AppCtrl">
       
-     
-    
-  <div id="map" style="width:800px;height:600px;"></div>
-      </div>
+  <div id="map"></div>
+  <div id="controller">
+  <h4> &nbsp Refresh Rate: </h4>
+<select class="mySelect" name="names" ng-model="select.rate" ng-change="refreshrate()">
+  <option value={{select.names[0]}}>Every 3 secs
+  <option value={{select.names[1]}}>Every 6 secs
+  <option value={{select.names[2]}}>Every 9 secs
+  <option  selected="selected" value={{select.names[3]}}>Never
+</select> <br><br>
+<h4> &nbsp Choose Your Route: </h4>
+<select class="mySelect" name="names" ng-options="vehicle.routeNumber for vehicle in vehicles | unique:'routeNumber'" ng-model="SelectedRoute" ng-change="chooseRoute()">
+</select>
+<div>
+</div>
  </body>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+   <script src="node_modules/angular-filter/dist/angular-filter.min.js"></script>
  <script src="http://maps.googleapis.com/maps/api/js"></script>
  <script src="controller.js"></script>
+
 
  </html>
