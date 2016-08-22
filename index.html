@@ -8,21 +8,23 @@
  <body>
   
       <div class="container" ng-controller="AppCtrl">
-      
-  <div id="map"></div>
-  <div id="controller">
-  <h4> &nbsp Refresh Rate: </h4>
-<select class="mySelect" name="names" ng-model="select.rate" ng-change="refreshrate()">
+   <button id="setting">settings</button>
+   <div id="menu">
+   	 <h4> &nbsp Refresh Rate: </h4>
+<select class="mySelect" name="names" ng-model="select.rate"  ng-init="select.rate=select.names[3]" >
   <option value={{select.names[0]}}>Every 3 secs
   <option value={{select.names[1]}}>Every 6 secs
   <option value={{select.names[2]}}>Every 9 secs
-  <option  selected="selected" value={{select.names[3]}}>Never
+  <option value={{select.names[3]}}>Never
 </select> <br><br>
 <h4> &nbsp Choose Your Route: </h4>
-<select class="mySelect" name="names" ng-options="vehicle.routeNumber for vehicle in vehicles | unique:'routeNumber'" ng-model="SelectedRoute" ng-change="chooseRoute()">
-</select>
-<div>
-</div>
+<select class="mySelect" name="names" ng-options="vehicle.routeNumber for vehicle in vehicles| orderBy:'routeNumber'|unique:'routeNumber'" ng-model="SelectedRoute">
+<option value="">All</option>
+</select><br><br>
+<button type="button" ng-click="refreshing()" class="btn btn-primary">Apply</button>
+   </div>
+  <div id="map"></div>
+  
  </body>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

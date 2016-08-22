@@ -1,6 +1,4 @@
- html, body { width: 100%;height: 100%; margin: 0; padding: 0; }
-  
-  #map{
+   #map{
   	position:absolute;
     width:75%; 
     height: 70%; 
@@ -47,4 +45,21 @@
     box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
     background: #2E5481;
     border: solid 1px #203E5F;
+}
+body {
+  font-family: 'Lucida Grande', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  padding: 20px 50px 150px;
+  font-size: 13px;
+  text-align: center;
+  background: #E3CAA1;
+}
+#menu{
+  position:absolute;
+  width:30%;
+  height:30%;
+  left:40%;
+  top:8%;
+  background:#FFFFFF;
+  z-index: 1;
+ visibility:hidden;
 }

@@ -1,5 +1,4 @@
 var mapcontrol = angular.module('mapcontrol', ['angular.filter']);
-var markers=[];
  var image = {
     url: 'image/bus.png',
     // This marker is 20 pixels wide by 32 pixels high.
@@ -9,6 +8,7 @@ var markers=[];
     // The anchor for this image is the base of the flagpole at (0, 32).
     
   };
+var x=0;
 var infowindow = new google.maps.InfoWindow();
 var latlng = new google.maps.LatLng(45.518,-122.672);
             var myOptions = {
@@ -23,67 +23,117 @@ var latlng = new google.maps.LatLng(45.518,-122.672);
       ],
             };
             var map = new google.maps.Map(document.getElementById("map"), myOptions); 
-mapcontrol.controller('AppCtrl', ['$scope', '$http','$timeout', function($scope, $http,$timeout) {
+
+  //setting window:
+  $('#setting').click(function(){
+     x=x+1;
+    if(x%2==1){$('#menu').css({'visibility':'visible'})};
+    if(x%2==0){$('#menu').css({'visibility':'hidden'})};
+
+  });   
+
+
+mapcontrol.controller('AppCtrl', ['$scope', '$http','$q','$log','$timeout', function($scope, $http,$q,$log,$timeout) {
+    
     console.log("Hello World from controller");
-    //loading data
-var refresh=function(){
-$http.get('/vehicles').success(function(response){
-      $scope.vehicles=response;
-      for(i=0;i<$scope.vehicles.length;i++){
-        var obj=$scope.vehicles[i];
-        
-        var marker = new google.maps.Marker({
-      position: new google.maps.LatLng(obj.latitude,obj.longitude),
-      icon: image,
-      map: map,
-     });
-     markers.push(marker);
-      var details = "<h5>RouteID:"+" "+"<mark>"+obj.routeNumber+"</mark>"+"</h5>"
-      +"<h5>Direction:"+" "+"<mark>"+obj.direction+"</mark>"+"</h5>"
-      +"<h5>Next Stop:"+" "+"<mark>"+obj.nextLocID+"</mark>"+"</h5>"
-      +"<h5>Next Stop:"+" "+"<mark>"+obj.longitude+"</mark>"+"</h5>";
-        bindInfoWindow(marker, map, infowindow, details);
-
-     
-
-
-
-};
-
-  function bindInfoWindow(marker, map, infowindow, strDescription) {
+    //loading data and building all the markers
+function bindInfoWindow(marker, map, infowindow, strDescription) {
     google.maps.event.addListener(marker, 'click', function () {
         infowindow.setContent(strDescription);
         infowindow.open(map, marker);
     });
    
-}   
-      
+}
+function markerfilter(){
+    setMapOnAll(null);
+ for(var i=0;i<$scope.vehicles.length;i++){
+  for(var j=0;j<$scope.result.length;j++)
+    if($scope.vehicles[i].routeNumber==$scope.result[j]){
+     $scope.markers[i].setMap(map);
+    }
+ }   
+}
+$scope.setting=false;
+$scope.result=[];
+$scope.loc=[];
+$scope.locid=[];
+var getloc= function() {
+  var deferred=$q.defer();  
+$http.get('/locations').success(function(response){
+   $scope.loc=response;
+   for(i=0;i<$scope.loc.length;i++){
+    $scope.locid.push($scope.loc[i].locid);
+   }
+   console.log($scope.locid.length);
+   deferred.resolve();
+   })
+   return deferred.promise;
+   }
+var refresh=function(){
+$http.get('/vehicles').success(function(response){
+      $scope.markers=[];
+      $scope.nextloc=[];
+      $scope.lastloc=[];
+      $scope.vehicles=response;
+      for(i=0;i<$scope.vehicles.length;i++){
+        var obj=$scope.vehicles[i];
+        var marker = new google.maps.Marker({
+      position: new google.maps.LatLng(obj.latitude,obj.longitude),
+      icon: image,
+      map: map,
+     });
+    var n=$scope.locid.indexOf(obj.nextLocID);
+    if(n!=-1){$scope.nextloc.push($scope.loc[n].desc)};
+    if(n==-1){$scope.nextloc.push("unknown")};
+    var m=$scope.locid.indexOf(obj.lastLocID);
+    if(m!=-1){$scope.lastloc.push($scope.loc[m].desc)};
+    if(m==-1){$scope.lastloc.push("unknown")};
+     $scope.markers.push(marker);
+     if($scope.setting==false){
+        $scope.result.push(obj.routeNumber);
+        }
+      var details = "<h5>RouteID:"+" "+"<mark>"+obj.routeNumber+"</mark>"+"</h5>"
+      +"<h5>Direction:"+" "+"<mark>"+obj.direction+"</mark>"+"</h5>"
+      +"<h5>Next Stop:"+" "+"<mark>"+$scope.nextloc[i]+"</mark>"+"</h5>"
+      +"<h5>Last Stop:"+" "+"<mark>"+$scope.lastloc[i]+"</mark>"+"</h5>"
+      +"<h5>Description:"+" "+"<mark>"+obj.signMessageLong+"</mark>"+"</h5>"
+      + "<h5>On time:"+" "+"<mark>"+obj.delay+" secs</mark>"+"</h5>";
+        bindInfoWindow(marker, map, infowindow, details);      
 
-
-
+};
+markerfilter();
 });
 }
-
+//visualizing
 function setMapOnAll(map) {
-  for (var i = 0; i < markers.length; i++) {
-    markers[i].setMap(map);
+  for (var i = 0; i < $scope.markers.length; i++) {
+    $scope.markers[i].setMap(map);
   }
 }
-refresh();
+$q.when().then(getloc).then(refresh);
  $scope.select = {
     rate: null,
     names:['3000','6000','9000','10000']
    };
 
-
-$scope.refreshrate=function(){
+//refresh rate function
+$scope.refreshing=function(){
+$scope.setting=true;
+$scope.result=[];
 clearInterval($scope.handle);
-if($scope.select.rate<9000){      
-$scope.handle=setInterval(function(){   console.log($scope.select.rate); setMapOnAll(null); markers=[]; refresh(); }, $scope.select.rate);
-
+if($scope.select.rate<=9000){      
+$scope.handle=setInterval(function(){console.log($scope.select.rate);setMapOnAll(null); $scope.markers=null; refresh(); }, $scope.select.rate);
 }
 
+  $scope.result.push($scope.SelectedRoute.routeNumber);
+markerfilter();
+
+$('#menu').css({'visibility':'hidden'});
+
 };
+
+
+
 
 
 
