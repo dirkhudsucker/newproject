@@ -3,12 +3,12 @@
  <head>
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="style.css">
-  <title> Initial Commit</title>
+  <title> Portland Public Transit Real-time Tracker</title>
  </head>
  <body>
-  
+     <h1>Portland Public Transit Real-time Tracker</h1>
       <div class="container" ng-controller="AppCtrl">
-   <button id="setting">settings</button>
+   <button type="button" id="setting" class="btn btn-primary">settings</button>
    <div id="menu">
    	 <h4> &nbsp Refresh Rate: </h4>
 <select class="mySelect" name="names" ng-model="select.rate"  ng-init="select.rate=select.names[3]" >
@@ -19,7 +19,7 @@
 </select> <br><br>
 <h4> &nbsp Choose Your Route: </h4>
 <select class="mySelect" name="names" ng-options="vehicle.routeNumber for vehicle in vehicles| orderBy:'routeNumber'|unique:'routeNumber'" ng-model="SelectedRoute">
-<option value="">All</option>
+<option value="">Please Select</option>
 </select><br><br>
 <button type="button" ng-click="refreshing()" class="btn btn-primary">Apply</button>
    </div>

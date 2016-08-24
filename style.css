@@ -4,7 +4,7 @@
     height: 70%; 
     margin: 0; 
     left:10%;
-    top:10%;
+    top:15%;
 
   }
   #controller{
@@ -58,7 +58,7 @@ body {
   width:30%;
   height:30%;
   left:40%;
-  top:8%;
+  top:14%;
   background:#FFFFFF;
   z-index: 1;
  visibility:hidden;

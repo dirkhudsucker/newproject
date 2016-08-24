@@ -24,17 +24,19 @@ var latlng = new google.maps.LatLng(45.518,-122.672);
             };
             var map = new google.maps.Map(document.getElementById("map"), myOptions); 
 
-  //setting window:
-  $('#setting').click(function(){
+
+  
+
+
+mapcontrol.controller('AppCtrl', ['$scope', '$http','$q','$log','$timeout', function($scope, $http,$q,$log,$timeout) {
+   //setting window:
+    $('#setting').click(function(){
+     clearInterval($scope.handle);
      x=x+1;
     if(x%2==1){$('#menu').css({'visibility':'visible'})};
     if(x%2==0){$('#menu').css({'visibility':'hidden'})};
 
   });   
-
-
-mapcontrol.controller('AppCtrl', ['$scope', '$http','$q','$log','$timeout', function($scope, $http,$q,$log,$timeout) {
-    
     console.log("Hello World from controller");
     //loading data and building all the markers
 function bindInfoWindow(marker, map, infowindow, strDescription) {
@@ -54,6 +56,7 @@ function markerfilter(){
  }   
 }
 $scope.setting=false;
+$scope.stopmarker=[];
 $scope.result=[];
 $scope.loc=[];
 $scope.locid=[];
@@ -82,13 +85,13 @@ $http.get('/vehicles').success(function(response){
       icon: image,
       map: map,
      });
+    $scope.markers.push(marker);
     var n=$scope.locid.indexOf(obj.nextLocID);
     if(n!=-1){$scope.nextloc.push($scope.loc[n].desc)};
     if(n==-1){$scope.nextloc.push("unknown")};
     var m=$scope.locid.indexOf(obj.lastLocID);
     if(m!=-1){$scope.lastloc.push($scope.loc[m].desc)};
     if(m==-1){$scope.lastloc.push("unknown")};
-     $scope.markers.push(marker);
      if($scope.setting==false){
         $scope.result.push(obj.routeNumber);
         }
@@ -118,6 +121,14 @@ $q.when().then(getloc).then(refresh);
 
 //refresh rate function
 $scope.refreshing=function(){
+  x=x+1;
+ if($scope.SelectedRoute!="a") {
+ if($scope.stopmarker.length>0){
+ for(var i=0;i<$scope.stopmarker.length;i++){
+$scope.stopmarker[i].setMap(null);
+}  
+}
+$scope.stopmarker=[];
 $scope.setting=true;
 $scope.result=[];
 clearInterval($scope.handle);
@@ -130,9 +141,29 @@ markerfilter();
 
 $('#menu').css({'visibility':'hidden'});
 
-};
+$http.post('/stops',$scope.SelectedRoute);
 
+$http.get('/stop').success(function(response){
+$scope.stops=response;
+for(var i=0;i<$scope.stops.length;i++){
+ var obj=$scope.stops[i];
+ var marker = new google.maps.Marker({
+      position: new google.maps.LatLng(obj.lat,obj.lng),
+      map: map,
+      zIndex:1
+     });
+ $scope.stopmarker.push(marker);
+  var details = "<h5>Stop Name:"+" "+"<mark>"+obj.desc+"</mark>"+"</h5>"
+      +"<h5>Coordinates:"+" "+"<mark>"+obj.lng+", "+obj.lat+"</mark>"+"</h5>";
+ bindInfoWindow(marker, map, infowindow, details); 
+}
+});
 
+} if($scope.SelectedRoute=="a"){
+alert("Please select")  
+}
+
+}
 
 
 
