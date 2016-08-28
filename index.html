@@ -8,10 +8,13 @@
  <body>
      <h1>Portland Public Transit Real-time Tracker</h1>
       <div class="container" ng-controller="AppCtrl">
-   <button type="button" id="setting" class="btn btn-primary">settings</button>
+    <h4>Enter Your Trimet Key to initialize (NOTE:If you do not have a key already, apply at <a href="http://www.trimet.org">trimet.org</a>)</h4>  <div id="initiator"><input type="text" placeholder="Enter 25-digit key here" ng-model="accesskey.key">  <button type="button" class="btn btn-danger" ng-click="initialize()">Initialize</button> </div> <h4>After loading, please press <font color="red">setting bar</font> at upper-left corner to set refresh interval, and choose your desired transit route. <font color="red">Note</font> that loading may take 5-10 seconds, subject to the server pressure and your internet speed.</h4> 
+   <br> <br> <br>
+   
    <div id="menu">
    	 <h4> &nbsp Refresh Rate: </h4>
-<select class="mySelect" name="names" ng-model="select.rate"  ng-init="select.rate=select.names[3]" >
+<select class="mySelect" name="names" ng-model="select.rate" ng-init="select.rate=select.names[3]">
+  <option selected disabled value="">Select the refresh rate</option>
   <option value={{select.names[0]}}>Every 3 secs
   <option value={{select.names[1]}}>Every 6 secs
   <option value={{select.names[2]}}>Every 9 secs
@@ -19,11 +22,11 @@
 </select> <br><br>
 <h4> &nbsp Choose Your Route: </h4>
 <select class="mySelect" name="names" ng-options="vehicle.routeNumber for vehicle in vehicles| orderBy:'routeNumber'|unique:'routeNumber'" ng-model="SelectedRoute">
-<option value="">Please Select</option>
+<option selected disabled value="">Select the route</option>
 </select><br><br>
 <button type="button" ng-click="refreshing()" class="btn btn-primary">Apply</button>
    </div>
-  <div id="map"></div>
+  <div id="map"></div><button type="button" id="setting" class="btn btn-primary">settings</button>
   
  </body>
 

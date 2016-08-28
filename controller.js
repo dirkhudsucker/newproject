@@ -1,5 +1,37 @@
 var mapcontrol = angular.module('mapcontrol', ['angular.filter']);
- var image = {
+  
+
+
+mapcontrol.controller('AppCtrl', ['$scope', '$http','$q','$log','$timeout', function($scope, $http,$q,$log,$timeout) {
+   //setting window:
+   $scope.accesskey={
+    username:null,
+    key:null
+   };
+   $scope.initialize=function(){
+    $http.post('/key',$scope.accesskey);
+    console.log($scope.accesskey.key);
+    $http.get('/access').success(function(response){
+      var access=response;
+      if(access==1){
+        $('#initiator').css({'visibility':'hidden'}); 
+       $('#setting').css({'visibility':'visible'}); 
+       alert("Success key, loading...")
+      $q.when().then(getloc).then(refresh);
+    } else{
+      alert("Wrong key or this is not 25-digit")
+    }
+    })
+  }
+   
+    $('#setting').click(function(){
+     clearInterval($scope.handle);
+     x=x+1;
+    if(x%2==1){$('#menu').css({'visibility':'visible'})};
+    if(x%2==0){$('#menu').css({'visibility':'hidden'})};
+
+  });   
+    var image = {
     url: 'image/bus.png',
     // This marker is 20 pixels wide by 32 pixels high.
     size: new google.maps.Size(32, 32),
@@ -22,21 +54,9 @@ var latlng = new google.maps.LatLng(45.518,-122.672);
         google.maps.MapTypeId.TERRAIN
       ],
             };
-            var map = new google.maps.Map(document.getElementById("map"), myOptions); 
+      
+var map = new google.maps.Map(document.getElementById("map"), myOptions);
 
-
-  
-
-
-mapcontrol.controller('AppCtrl', ['$scope', '$http','$q','$log','$timeout', function($scope, $http,$q,$log,$timeout) {
-   //setting window:
-    $('#setting').click(function(){
-     clearInterval($scope.handle);
-     x=x+1;
-    if(x%2==1){$('#menu').css({'visibility':'visible'})};
-    if(x%2==0){$('#menu').css({'visibility':'hidden'})};
-
-  });   
     console.log("Hello World from controller");
     //loading data and building all the markers
 function bindInfoWindow(marker, map, infowindow, strDescription) {
@@ -67,7 +87,6 @@ $http.get('/locations').success(function(response){
    for(i=0;i<$scope.loc.length;i++){
     $scope.locid.push($scope.loc[i].locid);
    }
-   console.log($scope.locid.length);
    deferred.resolve();
    })
    return deferred.promise;
@@ -113,7 +132,6 @@ function setMapOnAll(map) {
     $scope.markers[i].setMap(map);
   }
 }
-$q.when().then(getloc).then(refresh);
  $scope.select = {
     rate: null,
     names:['3000','6000','9000','10000']
@@ -128,12 +146,13 @@ $scope.refreshing=function(){
 $scope.stopmarker[i].setMap(null);
 }  
 }
+$scope.bounds = new google.maps.LatLngBounds();
 $scope.stopmarker=[];
 $scope.setting=true;
 $scope.result=[];
 clearInterval($scope.handle);
 if($scope.select.rate<=9000){      
-$scope.handle=setInterval(function(){console.log($scope.select.rate);setMapOnAll(null); $scope.markers=null; refresh(); }, $scope.select.rate);
+$scope.handle=setInterval(function(){setMapOnAll(null); $scope.markers=null; refresh(); }, $scope.select.rate);
 }
 
   $scope.result.push($scope.SelectedRoute.routeNumber);
@@ -152,14 +171,15 @@ for(var i=0;i<$scope.stops.length;i++){
       map: map,
       zIndex:1
      });
+ $scope.bounds.extend(marker.getPosition());
  $scope.stopmarker.push(marker);
   var details = "<h5>Stop Name:"+" "+"<mark>"+obj.desc+"</mark>"+"</h5>"
       +"<h5>Coordinates:"+" "+"<mark>"+obj.lng+", "+obj.lat+"</mark>"+"</h5>";
  bindInfoWindow(marker, map, infowindow, details); 
 }
+map.setCenter($scope.bounds.getCenter());
 });
-
-} if($scope.SelectedRoute=="a"){
+} if($scope.SelectedRoute==""){
 alert("Please select")  
 }
 
